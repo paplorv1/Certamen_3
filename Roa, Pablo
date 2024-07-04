@@ -1,0 +1,96 @@
+import csv
+import os
+import random
+
+bitacoras = []
+
+def limpiar_pantalla():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def validar_goles(goles):
+    return sum(goles) / len(goles) >= 2
+
+def registrar_bitacora():
+    nombre = input("Nombre del jugador: ")
+    año_nacimiento = int(input("Año de nacimiento (1985 en adelante ): "))
+    while año_nacimiento <= 1985:
+        print("Año de nacimiento incorrecto. Debe ser mayor a 1985.")
+        año_nacimiento = int(input("Año de nacimiento ( 1985 en adelante ): "))
+    
+    equipo = input("Equipo al que pertenece: ")
+    goles_usa = int(input("Goles contra USA: "))
+    goles_mexico = int(input("Goles contra México: "))
+    goles_colombia = int(input("Goles contra Colombia: "))
+    
+    if validar_goles([goles_usa, goles_mexico, goles_colombia]):
+        id_registro = random.randint(100000, 999999)
+        bitacora = {
+            "ID registro": id_registro,
+            "Jugador": nombre,
+            "Año Nacimiento": año_nacimiento,
+            "Equipo": equipo,
+            "USA": goles_usa,
+            "México": goles_mexico,
+            "Colombia": goles_colombia
+        }
+        bitacoras.append(bitacora)
+        print("Bitacora registrada con exito")
+    else:
+        print("El promedio de goles debe ser al menos 2")
+
+def listar_bitacoras():
+    print(f"{'ID registro':<10} {'Jugador':<20} {'Año Nacimiento':<15} {'Equipo':<10} {'USA':<5} {'México':<7} {'Colombia':<8}")
+    for bitacora in bitacoras:
+        print(f"{bitacora['ID registro']:<10} {bitacora['Jugador']:<20} {bitacora['Año Nacimiento']:<15} {bitacora['Equipo']:<10} {bitacora['USA']:<5} {bitacora['México']:<7} {bitacora['Colombia']:<8}")
+
+def imprimir_hoja_bitacoras():
+    equipos = ["Chile", "Argentina", "Perú", "Canadá"]
+    equipo_seleccionado = input(f"Seleccione un equipo ({', '.join(equipos)}): ")
+    while equipo_seleccionado not in equipos:
+        print("Equipo invalido.")
+        equipo_seleccionado = input(f"Seleccione un eqipo ({', '.join(equipos)}): ")
+
+    with open(f'bitacoras_{equipo_seleccionado}.csv', 'w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=["ID registro", "Jugador", "Año Nacimiento", "Equipo", "USA", "México", "Colombia"])
+        writer.writeheader()
+        for bitacora in bitacoras:
+            if bitacora["Equipo"] == equipo_seleccionado:
+                writer.writerow(bitacora)
+    print(f"Hoja de bitacoras para {equipo_seleccionado} exportada con eito.")
+
+def buscar_bitacora_por_id():
+    id_busqueda = int(input("Ingrese el ID de la bitácora: "))
+    for bitacora in bitacoras:
+        if bitacora["ID registro"] == id_busqueda:
+            print(f"{'ID registro':<10} {'Jugador':<20} {'Año Nacimiento':<15} {'Equipo':<10} {'USA':<5} {'México':<7} {'Colombia':<8}")
+            print(f"{bitacora['ID registro']:<10} {bitacora['Jugador']:<20} {bitacora['Año Nacimiento']:<15} {bitacora['Equipo']:<10} {bitacora['USA']:<5} {bitacora['México']:<7} {bitacora['Colombia']:<8}")
+            return
+    print("Bitscora no encontrada.")
+
+def main():
+    while True:
+        print("\nMenu Principal")
+        print("1. Registrar bitcra")
+        print("2. Listar bitcoras")
+        print("3. Imprimir hoja de bitacoras")
+        print("4. Buscar bitacora por ID")
+        print("5. Salir")
+        opcion = int(input("Seleccione una opcion: "))
+        
+        if opcion == 1:
+            registrar_bitacora()
+        elif opcion == 2:
+            listar_bitacoras()
+        elif opcion == 3:
+            imprimir_hoja_bitacoras()
+        elif opcion == 4:
+            buscar_bitacora_por_id()
+        elif opcion == 5:
+            break
+        else:
+            print("Opción incorreca.")
+        input("\nPresione Enter para continuar.")
+        limpiar_pantalla()
+
+if __name__ == "__main__":
+    main()
