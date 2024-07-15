@@ -1,0 +1,101 @@
+import random
+import csv
+from functools import reduce
+
+def asignar_sueldos():
+    empleados = ["Juan Pérez", "María García", "Carlos López", "Ana Martínez", "Pedro Rodríguez",
+                 "Laura Hernández", "Miguel Sánchez", "Isabel Gómez", "Francisco Díaz", "Elena Fernández"]
+    sueldos = [random.randint(300000, 2500000) for _ in empleados]
+    return empleados, sueldos
+
+def clasificar_sueldos(empleados, sueldos):
+    menores_800 = []
+    entre_800_y_2000 = []
+    mayores_2000 = []
+
+    for i in range(len(sueldos)):
+        if sueldos[i] < 800000:
+            menores_800.append((empleados[i], sueldos[i]))
+        elif 800000 <= sueldos[i] <= 2000000:
+            entre_800_y_2000.append((empleados[i], sueldos[i]))
+        else:
+            mayores_2000.append((empleados[i], sueldos[i]))
+
+    return menores_800, entre_800_y_2000, mayores_2000
+
+def ver_estadisticas(sueldos):
+    total_sueldos = sum(sueldos)
+    sueldo_minimo = min(sueldos)
+    sueldo_maximo = max(sueldos)
+    promedio_sueldo = total_sueldos / len(sueldos)
+    media_geometrica = reduce(lambda x, y: x * y, sueldos) ** (1 / len(sueldos))
+    
+    return {
+        "Total Sueldos": total_sueldos,
+        "Sueldo Mínimo": sueldo_minimo,
+        "Sueldo Máximo": sueldo_maximo,
+        "Promedio Sueldo": promedio_sueldo,
+        "Media Geométrica": media_geometrica
+    }
+
+def reporte_sueldos(empleados, sueldos):
+    reporte = []
+    for i in range(len(empleados)):
+        sueldo = sueldos[i]
+        descuento_salud = sueldo * 0.07
+        descuento_afp = sueldo * 0.12
+        sueldo_liquido = sueldo - descuento_salud - descuento_afp
+        reporte.append((empleados[i], sueldo, descuento_salud, descuento_afp, sueldo_liquido))
+    return reporte
+
+def exportar_reporte_csv(reporte, filename="reporte_sueldos.csv"):
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Nombre Empleado", "Sueldo Base", "Descuento Salud", "Descuento AFP", "Sueldo Líquido"])
+        for fila in reporte:
+            writer.writerow(fila)
+
+def mostrar_menu():
+    empleados, sueldos = [], []
+    while True:
+        print("\nMenu:")
+        print("1. Asignar sueldos aleatorios")
+        print("2. Clasificar sueldos")
+        print("3. Ver estadísticas")
+        print("4. Reporte de sueldos")
+        print("5. Salir del programa")
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == "1":
+            empleados, sueldos = asignar_sueldos()
+            print("Sueldos asignados exitosamente.")
+        elif opcion == "2":
+            if sueldos:
+                menores_800, entre_800_y_2000, mayores_2000 = clasificar_sueldos(empleados, sueldos)
+                print("Sueldos menores a $800,000:", menores_800)
+                print("Sueldos entre $800,000 y $2,000,000:", entre_800_y_2000)
+                print("Sueldos mayores a $2,000,000:", mayores_2000)
+            else:
+                print("Primero debe asignar los sueldos.")
+        elif opcion == "3":
+            if sueldos:
+                estadisticas = ver_estadisticas(sueldos)
+                for key, value in estadisticas.items():
+                    print(f"{key}: {value}")
+            else:
+                print("Primero debe asignar los sueldos.")
+        elif opcion == "4":
+            if sueldos:
+                reporte = reporte_sueldos(empleados, sueldos)
+                exportar_reporte_csv(reporte)
+                print("Reporte de sueldos generado y exportado a 'reporte_sueldos.csv'.")
+            else:
+                print("Primero debe asignar los sueldos.")
+        elif opcion == "5":
+            print("Saliendo del programa.")
+            break
+        else:
+            print("Opción no válida. Intente nuevamente.")
+
+if __name__ == "__main__":
+    mostrar_menu()
